@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "126401372833",
+    "project_id": "virtuenetz-ad18a",
+    "storage_bucket": "virtuenetz-ad18a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:126401372833:android:29db3d69420ba8304746e0",
+        "android_client_info": {
+          "package_name": "com.testprojectvn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "126401372833-von2mq9a7m16gq2csrvr8ntp2d6sk7sa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6nuqsrHLoJw1OlgCbYhsQ4RQLMMtqYHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "126401372833-von2mq9a7m16gq2csrvr8ntp2d6sk7sa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
