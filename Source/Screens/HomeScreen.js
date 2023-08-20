@@ -4,6 +4,11 @@ import { Colors } from '../Assets/Color/Colors'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
+
+import { connect } from 'react-redux'
+import ReducerAction from '../Data/Redux/ReducerAction'
+import ReducerProps from '../Data/Redux/ReducerProps'
+
 import NetInfo from '@react-native-community/netinfo';
 import Entypo from 'react-native-vector-icons/Entypo';
 
@@ -52,22 +57,22 @@ const HomeScreen = () => {
       setActiveStartTime(new Date());
     }
   };
-  // useEffect(() => {
-  //   AppState.addEventListener('change', handleAppStateChange);
+  useEffect(() => {
+    AppState.addEventListener('change', handleAppStateChange);
 
-  //   const interval = setInterval(() => {
-  //     if (appState === 'active') {
-  //       const now = new Date();
-  //       const timeDifference = now - activeStartTime;
-  //       setTimer(timeDifference);
-  //     }
-  //   }, 1000);
+    const interval = setInterval(() => {
+      if (appState === 'active') {
+        const now = new Date();
+        const timeDifference = now - activeStartTime;
+        setTimer(timeDifference);
+      }
+    }, 1000);
 
-  //   return () => {
-  //     AppState.removeEventListener('change', handleAppStateChange);
-  //     clearInterval(interval);
-  //   };
-  // }, [appState, activeStartTime]);
+    return () => {
+      AppState.removeEventListener('change', handleAppStateChange);
+      clearInterval(interval);
+    };
+  }, [appState, activeStartTime]);
   const getStatusText = () => {
     switch (appState) {
       case 'active':
@@ -94,14 +99,37 @@ const HomeScreen = () => {
     return `${seconds} seconds`;
   };
 
+
   const handleEdit = (item, index) => {
     setModalVisible(false);
     navigation.navigate("AddPorductScreen", { editItem: item, editIndex: index })
   };
+  const deleteProduct = async (productId) => {
+    try {
+      const snapshot = await firestore()
+        .collection('FoodProducts')
+        .doc('Products')
+        .get();
 
-  const handleDelete = () => {
-    setModalVisible(false);
-    onDelete(item.id);
+      if (snapshot.exists) {
+        const data = snapshot.data();
+        let productsArray = data.products || [];
+        productsArray.splice(productId, 1);
+
+        await firestore()
+          .collection('FoodProducts')
+          .doc('Products')
+          .update({
+            products: productsArray,
+          });
+
+        alert('Product deleted successfully!');
+      } else {
+        console.log('Document not found.');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
   };
 
   return (
@@ -116,10 +144,10 @@ const HomeScreen = () => {
         <Text style={styles.netStatus}>{isConnected ? 'Online' : 'Offline'}</Text>
 
         <View style={styles.appStatusWrapper}>
-          {/* <Text style={styles.appStatus}>AppStatus {getStatusText()}</Text>
+          <Text style={styles.appStatus}>AppStatus {getStatusText()}</Text>
           {appState === 'active' && (
             <Text style={styles.timerText}>{formatTimer(timer)}</Text>
-          )} */}
+          )}
         </View>
       </View>
 
@@ -136,7 +164,7 @@ const HomeScreen = () => {
 
                 <TouchableOpacity onPress={() => setModalVisible(true)}
                   style={styles.productOptions}>
-                  <Entypo name="dots-three-vertical" size={20} color="#900" />
+                  <Entypo name="dots-three-vertical" size={20} color={Colors.LIGHT_BLACK} />
                 </TouchableOpacity>
 
                 <Text numberOfLines={1} style={styles.productName}>{item.product_name}</Text>
@@ -155,7 +183,7 @@ const HomeScreen = () => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                      onPress={() => { }}
+                      onPress={() => { deleteProduct(index) }}
                       style={{ ...styles.optionTab, marginTop: hp(1), }} >
                       <Text style={styles.optionTabTitle}>Delete</Text>
                     </TouchableOpacity>
@@ -254,7 +282,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: hp(2),
-    // backgroundColor: 'plum',
   },
   priceTag: {
     fontSize: hp(2.2),
@@ -300,9 +327,6 @@ const styles = StyleSheet.create({
     fontSize: hp(2),
     color: Colors.WHITE_TEXT_COLOR
   },
-
-
-
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -335,4 +359,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default HomeScreen
+export default connect(ReducerProps, ReducerAction)(HomeScreen)

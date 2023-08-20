@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { View, Text, AppState, StyleSheet, StatusBar, TouchableOpacity, Button, TextInput } from 'react-native'
 import { Colors } from '../Assets/Color/Colors'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+
+import { connect } from 'react-redux'
+import ReducerAction from '../Data/Redux/ReducerAction'
+import ReducerProps from '../Data/Redux/ReducerProps'
 import NetInfo from '@react-native-community/netinfo';
 import firestore from '@react-native-firebase/firestore';
 
@@ -60,10 +64,6 @@ const AddPorductScreen = ({ route }) => {
         } catch (error) {
             console.error('Error adding product:', error);
         }
-
-        setProductName('');
-        setDescription('');
-        setProductPrice('');
     };
 
     const updateProduct = async (productId) => {
@@ -101,16 +101,15 @@ const AddPorductScreen = ({ route }) => {
         }
     };
 
-
     const handleAppStateChange = (nextAppState) => {
         setAppState(nextAppState);
     };
-    // useEffect(() => {
-    //     AppState.addEventListener('change', handleAppStateChange);
-    //     return () => {
-    //         AppState.removeEventListener('change', handleAppStateChange);
-    //     };
-    // }, []);
+    useEffect(() => {
+        AppState.addEventListener('change', handleAppStateChange);
+        return () => {
+            AppState.removeEventListener('change', handleAppStateChange);
+        };
+    }, []);
     const getStatusText = () => {
         switch (appState) {
             case 'active':
@@ -134,7 +133,7 @@ const AddPorductScreen = ({ route }) => {
 
             <View style={styles.header}>
                 <Text style={styles.netStatus}>{isConnected ? 'Online' : 'Offline'}</Text>
-                {/* <Text style={styles.appStatus}>{getStatusText()}</Text> */}
+                <Text style={styles.appStatus}>{getStatusText()}</Text>
             </View>
 
             <View style={styles.inputWrapper}>
@@ -232,4 +231,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default AddPorductScreen
+export default connect(ReducerProps, ReducerAction)(AddPorductScreen)
