@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const [timer, setTimer] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [itemList, setItemList] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
 
   useEffect(() => {
@@ -162,7 +163,7 @@ const HomeScreen = () => {
             return (
               <View style={styles.productBox}>
 
-                <TouchableOpacity onPress={() => setModalVisible(true)}
+                <TouchableOpacity onPress={() => { setModalVisible(true), setSelectedIndex(index) }}
                   style={styles.productOptions}>
                   <Entypo name="dots-three-vertical" size={20} color={Colors.LIGHT_BLACK} />
                 </TouchableOpacity>
@@ -174,7 +175,7 @@ const HomeScreen = () => {
                   <Text numberOfLines={1} style={styles.productPrice}>{item.product_price}</Text>
                 </View>
 
-                {(modalVisible && index == index.toString()) &&
+                {(modalVisible && selectedIndex == index) &&
                   <View style={styles.optionBox}>
                     <TouchableOpacity
                       onPress={() => { handleEdit(item, index) }}
