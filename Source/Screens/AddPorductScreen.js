@@ -12,9 +12,11 @@ const AddPorductScreen = ({ route }) => {
     const [isConnected, setIsConnected] = useState(true);
     const [appState, setAppState] = useState(AppState.currentState);
     const [getItem, setGetItem] = useState(route.params?.editItem ?? "");
+    const [getIndex, setGetIndex] = useState(route.params?.editIndex ?? "");
 
     useEffect(() => {
         console.log("======== GetItem on Edit =====>>", getItem)
+        console.log("======== GetIndex on Edit =====>>", getIndex)
         if (getItem !== "") {
             setProductName(getItem.product_name)
             setDescription(getItem.product_desc)
@@ -39,42 +41,66 @@ const AddPorductScreen = ({ route }) => {
 
     const addProductToFirestore = async () => {
         try {
-          await firestore()
-            .collection('FoodProducts')
-            .doc('Products')
-            .collection('MoreProducts')
-            .add({
-              product_name: productName,
-              product_desc: description,
-              product_price: productPrice,
-            }).then((ref) => { console.log("----Product Added --->", ref) });
-      
+            await firestore()
+                .collection('FoodProducts')
+                .doc('Products')
+                .update({
+                    products: firestore.FieldValue.arrayUnion({
+                        product_name: productName,
+                        product_desc: description,
+                        product_price: productPrice,
+                    }),
+                }).then(() => {
+                    alert('Added Successfully');
+                });
+            setProductName("")
+            setDescription("")
+            setProductPrice("")
+
         } catch (error) {
-          console.error('Error adding product:', error);
+            console.error('Error adding product:', error);
         }
-      
+
         setProductName('');
         setDescription('');
         setProductPrice('');
-      };
-      
-
-    const updateProduct = () => {
-        firestore().collection('FoodProducts')
-            .doc("Products")
-            .collection('MoreProducts')
-            .update({
-                product_name: productName,
-                product_desc: description,
-                product_price: productPrice,
-            })
-            .then(() => {
-                alert('Updated Successfully');
-            });
-        setProductName("")
-        setDescription("")
-        setProductPrice("")
     };
+
+    const updateProduct = async (productId) => {
+        try {
+            const snapshot = await firestore()
+                .collection('FoodProducts')
+                .doc('Products')
+                .get();
+
+            if (snapshot.exists) {
+                const data = snapshot.data();
+                const productsArray = data.products || [];
+
+                productsArray[productId].product_name = productName;
+                productsArray[productId].product_desc = description;
+                productsArray[productId].product_price = productPrice;
+
+                await firestore()
+                    .collection('FoodProducts')
+                    .doc('Products')
+                    .update({
+                        products: productsArray,
+                    }).then(() => {
+                        alert('Updated Successfully');
+                    });
+                setProductName("")
+                setDescription("")
+                setProductPrice("")
+
+            } else {
+                console.log('Document not found.');
+            }
+        } catch (error) {
+            console.error('Error updating product:', error);
+        }
+    };
+
 
     const handleAppStateChange = (nextAppState) => {
         setAppState(nextAppState);
@@ -144,7 +170,7 @@ const AddPorductScreen = ({ route }) => {
                     :
                     (<View style={styles.btnBox}>
                         <TouchableOpacity
-                            onPress={() => { updateProduct() }}
+                            onPress={() => { updateProduct(getIndex) }}
                             activeOpacity={0.5}
                             style={styles.button}>
                             <Text style={styles.btnTitle}>Update Product</Text>

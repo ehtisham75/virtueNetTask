@@ -19,11 +19,7 @@ const HomeScreen = () => {
 
 
   useEffect(() => {
-    firestore()
-      .collection('FoodProducts')
-      .doc('Products')
-      .collection('MoreProducts')
-      .onSnapshot(onCollectionUpdate)
+    getDataFromFirebase();
 
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected);
@@ -33,13 +29,21 @@ const HomeScreen = () => {
     }
   }, [])
 
-  onCollectionUpdate = (querySnapshot) => {
-    let tempArray = []
-    querySnapshot.forEach(documentSnapshot => {
-      tempArray.push(documentSnapshot.data())
-    });
-    setItemList(tempArray)
-    console.log('===========Food Items==========>>', tempArray)
+  const getDataFromFirebase = () => {
+    firestore()
+      .collection('FoodProducts')
+      .doc('Products')
+      .onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          const productsArray = data.products || [];
+
+          setItemList(productsArray);
+          console.log('======== home firebase data===>', productsArray);
+        } else {
+          console.log('No such document!');
+        }
+      });
   }
 
   const handleAppStateChange = (nextAppState) => {
@@ -90,9 +94,9 @@ const HomeScreen = () => {
     return `${seconds} seconds`;
   };
 
-  const handleEdit = (item) => {
+  const handleEdit = (item, index) => {
     setModalVisible(false);
-    navigation.navigate("AddPorductScreen", { editItem: item })
+    navigation.navigate("AddPorductScreen", { editItem: item, editIndex: index })
   };
 
   const handleDelete = () => {
@@ -145,7 +149,7 @@ const HomeScreen = () => {
                 {(modalVisible && index == index.toString()) &&
                   <View style={styles.optionBox}>
                     <TouchableOpacity
-                      onPress={() => { handleEdit(item) }}
+                      onPress={() => { handleEdit(item, index) }}
                       style={styles.optionTab} >
                       <Text style={styles.optionTabTitle}>Edit</Text>
                     </TouchableOpacity>
@@ -244,7 +248,7 @@ const styles = StyleSheet.create({
   productDescription: {
     fontSize: hp(2.2),
     color: Colors.LIGHTBLACK_TEXT_COLOR,
-    textAlign:'center',
+    textAlign: 'center',
   },
   priceBox: {
     flexDirection: 'row',
