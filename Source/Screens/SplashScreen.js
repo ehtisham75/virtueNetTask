@@ -18,7 +18,7 @@ const SplashScreen = () => {
           index: 0,
           routes: [
             {
-              name: 'HomeScreen',
+              name: "HomeScreen",
               //   params: {}
             },
           ],

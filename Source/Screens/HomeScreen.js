@@ -59,10 +59,10 @@ const HomeScreen = () => {
     }
   };
   useEffect(() => {
-    AppState.addEventListener('change', handleAppStateChange);
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
 
     const interval = setInterval(() => {
-      if (appState === 'active') {
+      if (appState === 'active' && activeStartTime) {
         const now = new Date();
         const timeDifference = now - activeStartTime;
         setTimer(timeDifference);
@@ -70,8 +70,8 @@ const HomeScreen = () => {
     }, 1000);
 
     return () => {
-      AppState.removeEventListener('change', handleAppStateChange);
-      clearInterval(interval);
+      subscription.remove(); 
+      clearInterval(interval); 
     };
   }, [appState, activeStartTime]);
   const getStatusText = () => {
@@ -96,9 +96,56 @@ const HomeScreen = () => {
       }
       return `${minutes} minutes`;
     }
-
     return `${seconds} seconds`;
   };
+
+  // const handleAppStateChange = (nextAppState) => {
+  //   setAppState(nextAppState);
+  //   if (nextAppState === 'active') {
+  //     setActiveStartTime(new Date());
+  //   }
+  // };
+  // useEffect(() => {
+  //   AppState.addEventListener('change', handleAppStateChange);
+
+  //   const interval = setInterval(() => {
+  //     if (appState === 'active') {
+  //       const now = new Date();
+  //       const timeDifference = now - activeStartTime;
+  //       setTimer(timeDifference);
+  //     }
+  //   }, 1000);
+
+  //   return () => {
+  //     AppState.removeEventListener('change', handleAppStateChange);
+  //     clearInterval(interval);
+  //   };
+  // }, [appState, activeStartTime]);
+  // const getStatusText = () => {
+  //   switch (appState) {
+  //     case 'active':
+  //       return 'Active';
+  //     case 'background':
+  //       return 'Background';
+  //     case 'inactive':
+  //       return 'Inactive';
+  //     default:
+  //       return 'Unknown';
+  //   }
+  // };
+  // const formatTimer = (milliseconds) => {
+  //   const seconds = Math.floor(milliseconds / 1000);
+  //   if (seconds >= 60) {
+  //     const minutes = Math.floor(seconds / 60);
+  //     if (minutes >= 60) {
+  //       const hours = Math.floor(minutes / 60);
+  //       return `${hours} hours`;
+  //     }
+  //     return `${minutes} minutes`;
+  //   }
+
+  //   return `${seconds} seconds`;
+  // };
 
 
   const handleEdit = (item, index) => {
