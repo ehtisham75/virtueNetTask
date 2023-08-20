@@ -9,7 +9,7 @@ import ReducerProps from '../Data/Redux/ReducerProps'
 import NetInfo from '@react-native-community/netinfo';
 import firestore from '@react-native-firebase/firestore';
 
-const AddPorductScreen = ({ route }) => {
+const AddPorductScreen = ({ route, addProductToRedux }) => {
     const [productName, setProductName] = useState('');
     const [description, setDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
@@ -37,11 +37,24 @@ const AddPorductScreen = ({ route }) => {
 
     const handleProducts = () => {
         if (productName !== "" && description !== "" && productPrice !== "") {
-            addProductToFirestore()
-            return
+            if (isConnected) {
+                addProductToFirestore();
+            } else {
+                const productData = {
+                    product_name: productName,
+                    product_desc: description,
+                    product_price: productPrice,
+                };
+                addProductToRedux(productData);
+                alert('Product added to Redux while offline.');
+                setProductName("");
+                setDescription("");
+                setProductPrice("");
+            }
+        } else {
+            alert("Please fill the data.");
         }
-        else { alert("Please fill the data.") }
-    }
+    };
 
     const addProductToFirestore = async () => {
         try {
@@ -65,7 +78,6 @@ const AddPorductScreen = ({ route }) => {
             console.error('Error adding product:', error);
         }
     };
-
     const updateProduct = async (productId) => {
         try {
             const snapshot = await firestore()
