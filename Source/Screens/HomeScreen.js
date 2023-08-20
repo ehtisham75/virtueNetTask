@@ -21,6 +21,8 @@ const HomeScreen = () => {
   useEffect(() => {
     firestore()
       .collection('FoodProducts')
+      .doc('Products')
+      .collection('MoreProducts')
       .onSnapshot(onCollectionUpdate)
 
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -88,18 +90,9 @@ const HomeScreen = () => {
     return `${seconds} seconds`;
   };
 
-  const foodItems = [
-    { id: '1', name: 'Pizza' },
-    { id: '2', name: 'Burger' },
-    { id: '3', name: 'Pasta' },
-    { id: '4', name: 'Salad' },
-  ];
-
-
   const handleEdit = (item) => {
     setModalVisible(false);
     navigation.navigate("AddPorductScreen", { editItem: item })
-    // onEdit(item);
   };
 
   const handleDelete = () => {
@@ -138,77 +131,38 @@ const HomeScreen = () => {
               <View style={styles.productBox}>
 
                 <TouchableOpacity onPress={() => setModalVisible(true)}
-                  style={{
-                    position: 'absolute',
-                    right: wp(2),
-                    top: hp(1),
-                    // alignItems: 'center',
-                    // justifyContent: 'center',
-                    // backgroundColor: 'plum',
-                  }}>
+                  style={styles.productOptions}>
                   <Entypo name="dots-three-vertical" size={20} color="#900" />
                 </TouchableOpacity>
 
-                <Text style={styles.productName}>{item.product_name}</Text>
+                <Text numberOfLines={1} style={styles.productName}>{item.product_name}</Text>
                 <Text numberOfLines={2} style={styles.productDescription}>{item.product_desc}</Text>
                 <View style={styles.priceBox}>
                   <Text style={styles.priceTag}>Rs: </Text>
-                  <Text style={styles.productPrice}>{item.product_price}</Text>
+                  <Text numberOfLines={1} style={styles.productPrice}>{item.product_price}</Text>
                 </View>
 
                 {(modalVisible && index == index.toString()) &&
-                  <View style={{
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    backgroundColor: Colors.LIGHT_BLACK,
-                    position: 'absolute',
-                    right: wp(6),
-                    top: hp(1),
-                    paddingHorizontal: wp(5),
-                    paddingVertical: hp(1.5),
-                    borderRadius: hp(1)
-                  }}>
+                  <View style={styles.optionBox}>
                     <TouchableOpacity
                       onPress={() => { handleEdit(item) }}
-                      style={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: Colors.WHITE
-                      }} >
-                      <Text style={{
-                        fontSize: hp(2),
-                        color: Colors.WHITE_TEXT_COLOR
-                      }}>Edit</Text>
+                      style={styles.optionTab} >
+                      <Text style={styles.optionTabTitle}>Edit</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => { }}
-                      style={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: Colors.WHITE,
-                        marginTop: hp(0.5),
-                      }} >
-                      <Text style={{
-                        fontSize: hp(2),
-                        color: Colors.WHITE_TEXT_COLOR
-                      }}>Delete</Text>
+                      style={{ ...styles.optionTab, marginTop: hp(1), }} >
+                      <Text style={styles.optionTabTitle}>Delete</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       onPress={() => { setModalVisible(false) }}
-                      style={{
-                        borderBottomWidth: 1,
-                        borderBottomColor: Colors.WHITE,
-                        marginTop: hp(0.5),
-                      }} >
-                      <Text style={{
-                        fontSize: hp(2),
-                        color: Colors.WHITE_TEXT_COLOR
-                      }}>Cancel</Text>
+                      style={{ ...styles.optionTab, marginTop: hp(1), }} >
+                      <Text style={styles.optionTabTitle}>Cancel</Text>
                     </TouchableOpacity>
 
                   </View>}
-
               </View>
             )
           }}
@@ -249,7 +203,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: Colors.e,
     borderRadius: hp(10),
-    // marginHorizontal: wp(5),
     paddingHorizontal: wp(3),
     paddingVertical: hp(1),
     marginTop: hp(1),
@@ -257,7 +210,6 @@ const styles = StyleSheet.create({
   appStatus: {
     color: Colors.WHITE_TEXT_COLOR,
     fontSize: hp(2.2),
-    // marginTop: hp(1),
   },
   timerText: {
     color: Colors.WHITE_TEXT_COLOR,
@@ -274,21 +226,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: wp(30),
-    height: hp(18),
+    height: hp(22),
     margin: 8,
-    // padding: 16,
-    // backgroundColor: '#f0f0f0',
     backgroundColor: Colors.SECONDARY_COLOR,
     borderRadius: 8,
+  },
+  productOptions: {
+    position: 'absolute',
+    right: wp(2),
+    top: hp(1),
   },
   productName: {
     fontSize: hp(2.5),
     fontWeight: '500',
-    color: Colors.BLACK_TEXT_COLOR
+    color: Colors.BLACK_TEXT_COLOR,
   },
   productDescription: {
     fontSize: hp(2.2),
-    color: Colors.LIGHTBLACK_TEXT_COLOR
+    color: Colors.LIGHTBLACK_TEXT_COLOR,
+    textAlign:'center',
   },
   priceBox: {
     flexDirection: 'row',
@@ -303,6 +259,25 @@ const styles = StyleSheet.create({
   productPrice: {
     fontSize: hp(2.2),
     color: Colors.PRIMARY_COLOR
+  },
+  optionBox: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.LIGHT_BLACK,
+    position: 'absolute',
+    right: wp(6),
+    top: hp(1),
+    paddingHorizontal: wp(5),
+    paddingVertical: hp(1.5),
+    borderRadius: hp(1)
+  },
+  optionTab: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.WHITE
+  },
+  optionTabTitle: {
+    fontSize: hp(2),
+    color: Colors.WHITE_TEXT_COLOR
   },
   addBtnWrap: {
     position: 'absolute',

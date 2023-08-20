@@ -62,6 +62,7 @@ const AddPorductScreen = ({ route }) => {
     const updateProduct = () => {
         firestore().collection('FoodProducts')
             .doc("Products")
+            .collection('MoreProducts')
             .update({
                 product_name: productName,
                 product_desc: description,
