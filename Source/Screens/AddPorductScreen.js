@@ -36,27 +36,13 @@ const AddPorductScreen = ({ route }) => {
         }
         else { alert("Please fill the data.") }
     }
-    // const pushProductToFirebase = async () => {
-    //     firestore().collection('FoodProducts')
-    //         .doc("Products")
-    //         .set({
-    //             product_name: productName,
-    //             product_desc: description,
-    //             product_price: productPrice,
-    //         })
-    //         .then((ref) => { console.log("------Product Added ------>", ref) });
-
-    //     setProductName("")
-    //     setDescription("")
-    //     setProductPrice("")
-    // }
 
     const addProductToFirestore = async () => {
         try {
           await firestore()
             .collection('FoodProducts')
             .doc('Products')
-            .collection('MoreProducts') // Reference the subcollection
+            .collection('MoreProducts')
             .add({
               product_name: productName,
               product_desc: description,
